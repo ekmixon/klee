@@ -103,14 +103,3 @@ def tomat4x4(q):
 
 def slerp(a, b, t):
 	raise NotImplementedError
-
-	cos_omega= vec4.dot(a, b)
-	
-	if (cos_omega<0.0):
-		cos_omega= -cos_omega
-		b= vec4.neg(b)
-
-	imega= math.acos(cos_omega)
-	t= sin(t*omega)/sin(omega)
-
-	return vec4.lerp(a, b, t)

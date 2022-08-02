@@ -43,26 +43,16 @@ def intersectLineCircle((p, no), (C, r)):
 def intersectCircleCircle(c0P, c0R, c1P, c1R):
 	v = vec2.sub(c1P, c0P)
 	d = vec2.length(v)
-	
+
 	R = c0R
 	r = c1R
 
 	try:	
 		x = (d*d - r*r + R*R)/(2*d)
 	except ZeroDivisionError:
-		if R<r:
-			return 'inside',()
-		elif r>R:
-			return 'outside',()
-		else:
-			return 'coincident',()
-	
+		return ('inside', ()) if R<r else ('coincident', ())
 	k = R*R - x*x
 	if k<0:
-		if x<0:
-			return 'inside',()
-		else:
-			return 'outside',()
-	else:
-		y = math.sqrt(k)
-		return 'intersect',(vec2.toangle(v),vec2.toangle((x,y)))
+		return ('inside', ()) if x<0 else ('outside', ())
+	y = math.sqrt(k)
+	return 'intersect',(vec2.toangle(v),vec2.toangle((x,y)))

@@ -28,30 +28,31 @@ def getSummary(input):
         else:
             elt[0] = None
             return la
+
     def getLines():
         return map(getLine,inputs)
+
     def putback(ln,elt):
         assert elt[0] is None
         elt[0] = ln
-        
+
     events = None
-    
+
     # read header (up to ob=)
     while 1:
         lns = getLines()
         ln = lns[0]
         if ln.startswith('ob='):
             break
-        else:
-            if ln.startswith('positions:'):
-                if ln!='positions: instr line\n':
-                    raise ValueError("unexpected 'positions' directive")
-            elif ln.startswith('events:'):
-                events = ln[len('events: '):].strip().split(' ')
+        if ln.startswith('positions:'):
+            if ln!='positions: instr line\n':
+                raise ValueError("unexpected 'positions' directive")
+        elif ln.startswith('events:'):
+            events = ln[len('events: '):].strip().split(' ')
 
     if events is None:
         raise ValueError('missing events directive')
-    boolTypes = set(['Icov','Iuncov'])
+    boolTypes = {'Icov', 'Iuncov'}
     numEvents = len(events)
     eventTypes = [e in boolTypes for e in events]
 
@@ -87,7 +88,7 @@ def getSummary(input):
         return results
 
     summed = [0]*len(events)
-    
+
     # read statistics
     while 1:
         lns = getLines()

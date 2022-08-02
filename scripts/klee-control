@@ -13,10 +13,7 @@ import os, signal, popen2
 
 def getPID(dir):
     f = open(os.path.join(dir,'info'))
-    for ln in f.readlines():
-        if ln.startswith('PID: '):
-            return int(ln[5:])
-    return None
+    return next((int(ln[5:]) for ln in f if ln.startswith('PID: ')), None)
 
 def execCmd(pid, gdbCmd, opts):
     cmd = ("gdb " +

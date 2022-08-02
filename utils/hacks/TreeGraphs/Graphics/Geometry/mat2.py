@@ -16,14 +16,14 @@ def det(m):
 
 def mul(a,b):
 	b_trans= zip(* b)
-	return tuple([transmulvec2(b_trans, a_r) for a_r in a])
+	return tuple(transmulvec2(b_trans, a_r) for a_r in a)
 
 	# multiple vector v by a transposed matrix
 def transmulvec2(m_trans,v):
-	return tuple([vec2.dot(v, m_c) for m_c in m_trans])
+	return tuple(vec2.dot(v, m_c) for m_c in m_trans)
 
 def mulvec2(m,v):
 	return transmulvec2(zip(* m), v)
 
 def mulN(m,N):
-	return tuple([vec2.mulN(v,N) for v in m])
+	return tuple(vec2.mulN(v,N) for v in m)

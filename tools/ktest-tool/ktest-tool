@@ -31,18 +31,18 @@ class KTest:
         try:
             f = open(path, 'rb')
         except IOError:
-            print('ERROR: file %s not found' % path)
+            print(f'ERROR: file {path} not found')
             sys.exit(1)
 
         hdr = f.read(5)
-        if len(hdr) != 5 or (hdr != b'KTEST' and hdr != b'BOUT\n'):
+        if len(hdr) != 5 or hdr not in [b'KTEST', b'BOUT\n']:
             raise KTestError('unrecognized file')
         version, = struct.unpack('>i', f.read(4))
         if version > version_no:
             raise KTestError('unrecognized version')
         numArgs, = struct.unpack('>i', f.read(4))
         args = []
-        for i in range(numArgs):
+        for _ in range(numArgs):
             size, = struct.unpack('>i', f.read(4))
             args.append(str(f.read(size).decode(encoding='ascii')))
 
@@ -55,16 +55,14 @@ class KTest:
 
         numObjects, = struct.unpack('>i', f.read(4))
         objects = []
-        for i in range(numObjects):
+        for _ in range(numObjects):
             size, = struct.unpack('>i', f.read(4))
             name = f.read(size).decode('utf-8')
             size, = struct.unpack('>i', f.read(4))
             bytes = f.read(size)
             objects.append((name, bytes))
 
-        # Create an instance
-        b = KTest(version, path, args, symArgvs, symArgvLen, objects)
-        return b
+        return KTest(version, path, args, symArgvs, symArgvLen, objects)
 
     def __init__(self, version, path, args, symArgvs, symArgvLen, objects):
         self.version = version
@@ -84,7 +82,7 @@ class KTest:
         print('num objects: %r' % len(self.objects), file=sio)
 
         # format strings
-        fmt = dict()
+        fmt = {}
         fmt['name'] = "object {0:" + width + "d}: name: '{1}'"
         fmt['size'] = "object {0:" + width + "d}: size: {1}"
         fmt['int' ] = "object {0:" + width + "d}: int : {1}"
@@ -120,14 +118,11 @@ class KTest:
             if name not in object_names:
                 continue
 
-            f = open(self.path + '.' + name, 'wb')
-            blob = data.rstrip(b'\x00') if trim_zeros else data
-            f.write(blob)
-            f.close()
+            with open(f'{self.path}.{name}', 'wb') as f:
+                blob = data.rstrip(b'\x00') if trim_zeros else data
+                f.write(blob)
             extracted_objects.add(name)
-        missing_objects = list(object_names - extracted_objects)
-        missing_objects.sort()
-        if missing_objects:
+        if missing_objects := sorted(object_names - extracted_objects):
             sys.exit(f'Could not find object{"s"[:len(missing_objects)^1]}: {", ".join(missing_objects)}')
 
 

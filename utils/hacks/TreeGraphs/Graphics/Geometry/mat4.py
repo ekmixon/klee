@@ -42,15 +42,15 @@ def fromortho(left,right,bottom,top,znear,zfar):
 	return (m0,m1,m2,m3)
 
 def mulN(m,N):
-	return tuple([vec4.mulN(v,N) for v in m])
+	return tuple(vec4.mulN(v,N) for v in m)
 	
 def mul(a,b):
 	b_trans= zip(* b)
-	return tuple([transmulvec4(b_trans, a_r) for a_r in a])
+	return tuple(transmulvec4(b_trans, a_r) for a_r in a)
 
 	# multiple vector v by a transposed matrix
 def transmulvec4(m_trans,v):
-	return tuple([vec4.dot(v, m_c) for m_c in m_trans])
+	return tuple(vec4.dot(v, m_c) for m_c in m_trans)
 
 def mulvec4(m,v):
 	return transmulvec4(zip(* m), v)
@@ -155,7 +155,7 @@ def inv(m):
 	d= det(m)
 	t= trans(adj(m))
 	v= 1.0/d
-	return tuple([(a*v,b*v,c*v,d*v) for a,b,c,d in t])
+	return tuple((a*v, b*v, c*v, d*v) for a,b,c,d in t)
 	
 def toGL(m):
 	m0,m1,m2,m3= m

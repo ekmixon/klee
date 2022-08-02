@@ -13,10 +13,10 @@ with open(os.path.join(abs_path,"../../.github/workflows/build.yaml"), 'r') as s
         print(ci_config['jobs']['Linux']['strategy']['matrix']['include'])
         for job in ci_config['jobs']['Linux']['strategy']['matrix']['include']:
             if job['name'] in ["Docker", "macOS"]:
-                print("Skip: {}".format(job['name']))
+                print(f"Skip: {job['name']}")
                 continue
 
-            print("Building: {}".format(job['name']))
+            print(f"Building: {job['name']}")
 
             build_env = os.environ.copy()
 
@@ -35,8 +35,8 @@ with open(os.path.join(abs_path,"../../.github/workflows/build.yaml"), 'r') as s
                   '--create-final-image', # assume KLEE is the final image
                   ]
 
-            env_str = ["{}={}".format(k,v) for k,v in build_vars.items()]
-            print("{} {}".format(" ".join(env_str)," ".join(cmd)) )
+            env_str = [f"{k}={v}" for k,v in build_vars.items()]
+            print(f'{" ".join(env_str)} {" ".join(cmd)}')
 
             process = subprocess.Popen(cmd, # Assume KLEE is the final image
                             stdout=subprocess.PIPE,
@@ -48,7 +48,7 @@ with open(os.path.join(abs_path,"../../.github/workflows/build.yaml"), 'r') as s
                 print(output.strip())
                 return_code = process.poll()
                 if return_code is not None:
-                    print('Building image failed: {}'.format(return_code))
+                    print(f'Building image failed: {return_code}')
                     for output in process.stdout.readlines():
                         print(output.strip())
                     break

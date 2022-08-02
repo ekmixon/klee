@@ -30,8 +30,7 @@ def generator_fold(it):
    
     for res in it:
         if isinstance(res,GeneratorType):
-            for res in generator_fold(res):
-                yield res
+            yield from generator_fold(res)
         else:
             yield res
 

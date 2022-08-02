@@ -33,12 +33,11 @@ def getTreeStream(path):
 
 def writeTreeStream(path, output):
     paths = getTreeStream(path)
-    print 'Writing %d paths'%len(paths)
+    paths = getTreeStream(path)
     for i,data in paths.items():
         if i!=0:
-            f = open('%s%04d'%(output,i), 'wb')
-            f.write(data)
-            f.close()
+            with open('%s%04d'%(output,i), 'wb') as f:
+                f.write(data)
             
 def main(args):
     from optparse import OptionParser
@@ -47,9 +46,8 @@ def main(args):
 
     input,outputPrefix = args
 
-    f = open(input,'rb')
-    data = f.read()
-    f.close()
+    with open(input,'rb') as f:
+        data = f.read()
     writeTreeStream(data, outputPrefix)
     
 if __name__=='__main__':

@@ -21,8 +21,8 @@ def checkAssemblies(directories):
         try:
             return open(os.path.join(d,'assembly.ll')).read()
         except:
-            raise MergeError("unable to open assembly for: %s"%(`d`,))
-    
+            raise MergeError('unable to open assembly for: d')
+
     reference = read(directories[0])
     for d in directories[1:]:
         if reference != read(d):
@@ -48,14 +48,16 @@ def merge(inputs, output, outputDir):
         else:
             elt[0] = None
             return la
+
     def getLines():
         return map(getLine,inputs)
+
     def putback(ln,elt):
         assert elt[0] is None
         elt[0] = ln
-        
+
     events = None
-    
+
     # read header (up to ob=)
     while 1:
         lns = getLines()
@@ -77,7 +79,7 @@ def merge(inputs, output, outputDir):
 
     if events is None:
         raise MergeError('missing events directive')
-    boolTypes = set(['Icov','Iuncov'])
+    boolTypes = {'Icov', 'Iuncov'}
     numEvents = len(events)
     eventTypes = [e in boolTypes for e in events]
 
@@ -86,14 +88,14 @@ def merge(inputs, output, outputDir):
             raise MergeError("instruction or line specifications differ")
         elif [d for d in datas if len(d)!=numEvents+2]:
             raise MergeError("statistics differ in event counts")
-        
+
         result = [datas[0][0],datas[0][1]]
         for i,ev in enumerate(events):
-            s = sum([d[i+2] for d in datas])
+            s = sum(d[i+2] for d in datas)
             if ev=='Icov':
-                result.append(max([d[i+2] for d in datas])) # true iff any are non-zero
+                result.append(max(d[i+2] for d in datas))
             elif ev=='Iuncov':
-                result.append(min([d[i+2] for d in datas])) # true iff any are non-zero
+                result.append(min(d[i+2] for d in datas))
             else:
                 result.append(s)
         return result
@@ -128,7 +130,7 @@ def merge(inputs, output, outputDir):
                     putback(ln, elt)
                     break
         return results
-    
+
     # read statistics
     while 1:
         lns = getLines()

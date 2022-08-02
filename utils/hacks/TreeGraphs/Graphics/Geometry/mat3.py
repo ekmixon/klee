@@ -25,17 +25,17 @@ def fromscaleN(n):
 
 def mul(a,b):
 	b_trans= zip(* b)
-	return tuple([transmulvec3(b_trans, a_r) for a_r in a])
+	return tuple(transmulvec3(b_trans, a_r) for a_r in a)
 
 	# multiple vector v by a transposed matrix
 def transmulvec3(m_trans,v):
-	return tuple([vec3.dot(v, m_c) for m_c in m_trans])
+	return tuple(vec3.dot(v, m_c) for m_c in m_trans)
 
 def mulvec3(m,v):
 	return transmulvec3(zip(* m), v)
 
 def mulN(m,N):
-	return tuple([vec3.mulN(v,N) for v in m])
+	return tuple(vec3.mulN(v,N) for v in m)
 
 def det(m):
 	((m00,m01,m02),

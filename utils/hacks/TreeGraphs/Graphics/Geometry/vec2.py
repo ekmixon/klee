@@ -17,10 +17,7 @@ def random(rng=random):
 
 def getangle(a):
 	x,y= a
-	if y>=0:
-		return atan2(y,x)
-	else:
-		return pi*2 + atan2(y,x)
+	return atan2(y,x) if y>=0 else pi*2 + atan2(y,x)
 toangle = getangle
 
 def topolar(pt):

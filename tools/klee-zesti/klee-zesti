@@ -20,8 +20,8 @@ def find_klee_bin_dir():
   global KLEE
   global GEN_BOUT
   bin_dir = os.path.dirname(os.path.realpath(__file__))
-  KLEE = bin_dir + "/klee"
-  GEN_BOUT = bin_dir + "/gen-bout"
+  KLEE = f"{bin_dir}/klee"
+  GEN_BOUT = f"{bin_dir}/gen-bout"
   if not os.path.isfile(KLEE):
       print("WARNING can't find klee at " + KLEE)
       KLEE= shutil.which("klee")
@@ -65,7 +65,7 @@ def get_stdin_file(tmpdir):
     stdin += sys.stdin.readline()
   if stdin == "":
       return None, stdin_size
-  stdin_file_name = tmpdir.name + "/stdin.file"
+  stdin_file_name = f"{tmpdir.name}/stdin.file"
   with open(stdin_file_name, 'w') as f:
     stdin_size = f.write(stdin)
   return stdin_file_name, stdin_size
@@ -93,7 +93,7 @@ def prog_args_to_posix(prog_args):
   return posix_args, gen_out_args
 
 def create_ktest_file(gen_out_args, tmpdir):
-  out_file=tmpdir + "/test.ktest"
+  out_file = f"{tmpdir}/test.ktest"
   subprocess.run([GEN_BOUT, "--bout-file", out_file] + gen_out_args, check=True)
   return out_file
 
@@ -112,8 +112,8 @@ def main():
       gen_out_args += ["--sym-stdin", stdin_file]
       posix_args += ["--sym-stdin", str(stdin_size)]
   ktest_file = create_ktest_file(gen_out_args,tmpdir.name)
-  klee_args += ["-seed-file=" + ktest_file]
-  
+  klee_args += [f"-seed-file={ktest_file}"]
+
   proc = subprocess.Popen([KLEE] + klee_args + [prog] + posix_args, stdout=sys.stdout, stderr=sys.stderr)
   while proc.returncode is None:
       try:

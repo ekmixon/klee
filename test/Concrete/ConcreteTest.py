@@ -8,44 +8,45 @@ import sys
 import shutil
 
 def testFile(name, klee_path, lli_path):
-    print("CWD: \"{}\"".format(os.getcwd()))
+    print(f'CWD: \"{os.getcwd()}\"')
     baseName,ext = os.path.splitext(name)
-    exeFile = 'Output/linked_%s.bc'%baseName
+    exeFile = f'Output/linked_{baseName}.bc'
 
-    if platform.system() == 'FreeBSD':
-        make_prog = 'gmake'
-    else:
-        make_prog = 'make'
-
+    make_prog = 'gmake' if platform.system() == 'FreeBSD' else 'make'
     print('-- building test bitcode --')
     if os.path.exists("Makefile.cmake.test"):
         # Prefer CMake generated make file
-        make_cmd = '%s -f Makefile.cmake.test %s 2>&1' % (make_prog, exeFile,)
+        make_cmd = f'{make_prog} -f Makefile.cmake.test {exeFile} 2>&1'
     else:
-        make_cmd = '%s %s 2>&1' % (make_prog, exeFile,)
-    print("EXECUTING: %s" % (make_cmd,))
+        make_cmd = f'{make_prog} {exeFile} 2>&1'
+    print(f"EXECUTING: {make_cmd}")
     sys.stdout.flush()
     if os.system(make_cmd):
         raise SystemExit('make failed')
 
     print('\n-- running lli --')
     lli_cmd = [lli_path, '-force-interpreter=true', exeFile]
-    print("EXECUTING: %s" % (lli_cmd,))
+    print(f"EXECUTING: {lli_cmd}")
 
     lliOut = subprocess.check_output(lli_cmd).decode()
     print('-- lli output --\n%s--\n' % (lliOut,))
 
     print('-- running klee --')
-    klee_out_path = "Output/%s.klee-out" % (baseName,)
+    klee_out_path = f"Output/{baseName}.klee-out"
     if os.path.exists(klee_out_path):
         shutil.rmtree(klee_out_path)
-    klee_cmd = klee_path.split() + ['--output-dir=' + klee_out_path,  '--write-no-tests', exeFile]
-    print("EXECUTING: %s" % (klee_cmd,))
+    klee_cmd = klee_path.split() + [
+        f'--output-dir={klee_out_path}',
+        '--write-no-tests',
+        exeFile,
+    ]
+
+    print(f"EXECUTING: {klee_cmd}")
     sys.stdout.flush()
 
     kleeOut = subprocess.check_output(klee_cmd).decode()
     print('-- klee output --\n%s--\n' % (kleeOut,))
-        
+
     if lliOut != kleeOut:
         raise SystemExit('outputs differ')
         
@@ -58,7 +59,7 @@ def testOneFile(f, printOutput=False):
         code = ['fail','xfail'][f.startswith('broken')]
         extra = str(e)
 
-    print('%s: %s -- %s'%(code,f,extra))
+    print(f'{code}: {f} -- {extra}')
 
 def main():
     parser = argparse.ArgumentParser()

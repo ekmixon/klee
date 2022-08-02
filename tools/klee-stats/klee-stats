@@ -145,7 +145,7 @@ def add_artificial_columns(record):
 
     # Convert recorded times from microseconds to seconds
     for key in ["UserTime", "WallTime", "QueryTime", "SolverTime", "CexCacheTime", "ForkTime", "ResolveTime"]:
-        if not key in record:
+        if key not in record:
             continue
         record[key] /= 1000000
 
@@ -172,7 +172,7 @@ def add_artificial_columns(record):
     # Add relative times
     for key in ["SolverTime", "CexCacheTime", "ForkTime", "ResolveTime", "UserTime"]:
         if "WallTime" in record and key in record:
-            record["Rel"+key] = 100 * record[key] / record["WallTime"]
+            record[f"Rel{key}"] = 100 * record[key] / record["WallTime"]
 
     return record
 
@@ -221,7 +221,7 @@ def grafana(dirs, host_address, port):
         to = toEpoch(jsn["range"]["to"])
         targets = [str(t["target"]) for t in jsn["targets"]]
         startTime = getKleeStartTime()
-        fromTime = frm - startTime if frm - startTime > 0 else 0
+        fromTime = max(frm - startTime, 0)
         toTime = to - startTime if to - startTime > fromTime else fromTime + 100
         #convert to microseconds
         startTime, fromTime, toTime = startTime*1000000, fromTime*1000000, toTime*1000000
@@ -302,7 +302,7 @@ def write_table(args, data, dirs, pr):
     data = list(zip(dirs, data))
 
     # build the main body of the table
-    table = dict()
+    table = {}
     for i, (path, records) in enumerate(data):
         stats = records.aggregateRecords()
         # Get raw row
@@ -331,9 +331,7 @@ def write_table(args, data, dirs, pr):
             table[key].append(single_row[key])
 
     # Rename columns
-    name_mapping = dict()
-    for entry in Legend:
-        name_mapping[entry[2]] = entry[0]
+    name_mapping = {entry[2]: entry[0] for entry in Legend}
     table = rename_columns(table, name_mapping)
 
     # Add a summary row
@@ -346,11 +344,11 @@ def write_table(args, data, dirs, pr):
             # TODO: this is a bit bad but ... . In a nutshell, if the name of a column starts or ends with certain
             #  pattern change the summary function.
             if k.startswith("Avg") or k.endswith("(%)"):
-                total = sum([e for e in table[k] if e is not None])/max_len
+                total = sum(e for e in table[k] if e is not None) / max_len
             elif k.startswith("Max"):
-                total = max([e for e in table[k] if e is not None])
+                total = max(e for e in table[k] if e is not None)
             else:
-                total = sum([e for e in table[k] if e is not None])
+                total = sum(e for e in table[k] if e is not None)
             table[k].append(total)
 
         table['Path'].append('Total ({0})'.format(max_len))

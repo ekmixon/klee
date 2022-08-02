@@ -35,7 +35,7 @@ from subprocess import Popen, PIPE
 def get_shared_library_dependency(program):
     """Calls `ldd' to get the shared library dependency of a `program'."""
 
-    cmd = "ldd %s" % program
+    cmd = f"ldd {program}"
     prog = Popen(cmd.split(), stdout=PIPE, stderr=PIPE, shell=False)
     out, err = prog.communicate(None)
     prog.stdout.close()
@@ -77,7 +77,7 @@ def build_environment(root, libs):
 
 
 def usage():
-    print("Usage: %s /path/to/root/dir /path/to/program" % sys.argv[0])
+    print(f"Usage: {sys.argv[0]} /path/to/root/dir /path/to/program")
 
 
 if __name__ == "__main__":
